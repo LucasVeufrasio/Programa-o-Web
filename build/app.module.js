@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
+const user_entity_1 = require("./users/user.entity");
 // import { User } from './users/user.entity'; 
 // import { UserModule } from './users/user.module'; 
 let AppModule = class AppModule {
@@ -24,7 +25,7 @@ exports.AppModule = AppModule = __decorate([
                 username: 'postgres',
                 password: '123',
                 database: 'programacao_web',
-                entities: [],
+                entities: [user_entity_1.User],
                 synchronize: true,
             }),
         ],
