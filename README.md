@@ -5,7 +5,7 @@ O sistema será uma aplicação web para criptografia de arquivos, com:
 
 - **CRUD**: Gerenciamento de usuários e chaves criptográficas.  
 - **Transação**: Criptografia e descriptografia de arquivos.  
-- **Arquitetura**: Microserviço.  
+- **Arquitetura**: Modular.  
 - **Controle de Acesso**: Login com autenticação via token JWT.  
 - **Repositório**: Git e Notion para versionamento e documentação.  
 
