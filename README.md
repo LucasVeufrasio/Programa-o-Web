@@ -74,11 +74,20 @@ O sistema será uma aplicação web para criptografia de arquivos, com:
 
 ---
 
-## Desenvolvedores  
+## 📌 Funcionalidades Implementadas
 
-- **Lucas Vinicius Eufrasio**  
-- **Sandro Machinski**  
+### ✅ CRUD de Usuários com NestJS + TypeORM + PostgreSQL
+- **POST /users** – Criação de usuários com `name`, `email` e `password`.
+- **GET /users** – Listagem de todos os usuários cadastrados.
+- **GET /users/:id** – Busca de um usuário específico por ID.
+- Dados persistidos em banco de dados **PostgreSQL** com integração via **TypeORM**.
+- Uso de **DTOs (Data Transfer Objects)** para padronização dos dados.
 
-## Plano de Trabalho  
+#### 📤 Exemplo de JSON para cadastro de usuário:
 
-[Jira - CatolicaSC Team](https://catolicasc-team.atlassian.net/jira/software/projects/LS/boards/2?atlOrigin=eyJpIjoiY2Y4YjhkNGFlOTQxNGI0OTg2ZmQ5NTg4ZjYxNzhmOWEiLCJwIjoiaiJ9)  
+```json
+{
+  "name": "Lucas Vinicius",
+  "email": "lucas@email.com",
+  "password": "123456"
+}
