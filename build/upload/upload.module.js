@@ -6,20 +6,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserModule = void 0;
+exports.UploadModule = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const user_entity_1 = require("./user.entity");
-const user_service_1 = require("./user.service");
-const user_controller_1 = require("./user.controller");
-let UserModule = class UserModule {
+const upload_controller_1 = require("./upload.controller");
+let UploadModule = class UploadModule {
 };
-exports.UserModule = UserModule;
-exports.UserModule = UserModule = __decorate([
+exports.UploadModule = UploadModule;
+exports.UploadModule = UploadModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User])],
-        providers: [user_service_1.UserService],
-        controllers: [user_controller_1.UserController],
-        exports: [user_service_1.UserService],
+        controllers: [upload_controller_1.UploadController],
     })
-], UserModule);
+], UploadModule);

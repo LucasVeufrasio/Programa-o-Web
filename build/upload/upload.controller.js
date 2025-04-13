@@ -45,43 +45,59 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
+exports.UploadController = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const typeorm_2 = require("typeorm");
-const user_entity_1 = require("./user.entity");
-const bcrypt = __importStar(require("bcrypt"));
-let UserService = class UserService {
-    userRepository;
-    constructor(userRepository) {
-        this.userRepository = userRepository;
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
+const path_1 = require("path");
+const fs = __importStar(require("fs"));
+let UploadController = class UploadController {
+    uploadFile(file) {
+        return {
+            message: 'Arquivo enviado com sucesso!',
+            filename: file.filename,
+        };
     }
-    async create(createUserDto) {
-        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        const user = this.userRepository.create({
-            ...createUserDto,
-            password: hashedPassword,
-        });
-        return this.userRepository.save(user);
+    listFiles() {
+        const directoryPath = (0, path_1.join)(__dirname, '..', '..', 'uploads');
+        const files = fs.readdirSync(directoryPath);
+        return files;
     }
-    async findAll() {
-        return this.userRepository.find();
-    }
-    async findOne(id) {
-        return this.userRepository.findOneBy({ id });
-    }
-    async update(id, updateUserDto) {
-        await this.userRepository.update(id, updateUserDto);
-        return this.userRepository.findOneBy({ id });
-    }
-    async remove(id) {
-        await this.userRepository.delete(id);
-        return { message: `Usuário com ID ${id} foi removido.` };
+    viewPage(res) {
+        res.sendFile((0, path_1.join)(process.cwd(), 'src', 'upload', 'upload.html'));
     }
 };
-exports.UserService = UserService;
-exports.UserService = UserService = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
-], UserService);
+exports.UploadController = UploadController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
+        storage: (0, multer_1.diskStorage)({
+            destination: './uploads',
+            filename: (req, file, callback) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                const ext = (0, path_1.extname)(file.originalname);
+                callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+            },
+        }),
+    })),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UploadController.prototype, "uploadFile", null);
+__decorate([
+    (0, common_1.Get)('list'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UploadController.prototype, "listFiles", null);
+__decorate([
+    (0, common_1.Get)('view'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UploadController.prototype, "viewPage", null);
+exports.UploadController = UploadController = __decorate([
+    (0, common_1.Controller)('upload')
+], UploadController);

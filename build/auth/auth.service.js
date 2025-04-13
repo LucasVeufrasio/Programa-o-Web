@@ -41,47 +41,34 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
+exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const typeorm_2 = require("typeorm");
-const user_entity_1 = require("./user.entity");
+const jwt_1 = require("@nestjs/jwt");
+const user_service_1 = require("../users/user.service");
 const bcrypt = __importStar(require("bcrypt"));
-let UserService = class UserService {
-    userRepository;
-    constructor(userRepository) {
-        this.userRepository = userRepository;
+let AuthService = class AuthService {
+    userService;
+    jwtService;
+    constructor(userService, jwtService) {
+        this.userService = userService;
+        this.jwtService = jwtService;
     }
-    async create(createUserDto) {
-        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        const user = this.userRepository.create({
-            ...createUserDto,
-            password: hashedPassword,
-        });
-        return this.userRepository.save(user);
-    }
-    async findAll() {
-        return this.userRepository.find();
-    }
-    async findOne(id) {
-        return this.userRepository.findOneBy({ id });
-    }
-    async update(id, updateUserDto) {
-        await this.userRepository.update(id, updateUserDto);
-        return this.userRepository.findOneBy({ id });
-    }
-    async remove(id) {
-        await this.userRepository.delete(id);
-        return { message: `Usuário com ID ${id} foi removido.` };
+    async validateUser(loginDto) {
+        const users = await this.userService.findAll();
+        const user = users.find(u => u.email === loginDto.email);
+        if (user && (await bcrypt.compare(loginDto.password, user.password))) {
+            const payload = { sub: user.id, email: user.email };
+            return {
+                access_token: this.jwtService.sign(payload),
+            };
+        }
+        return null;
     }
 };
-exports.UserService = UserService;
-exports.UserService = UserService = __decorate([
+exports.AuthService = AuthService;
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
-], UserService);
+    __metadata("design:paramtypes", [user_service_1.UserService,
+        jwt_1.JwtService])
+], AuthService);
