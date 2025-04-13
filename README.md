@@ -1,93 +1,80 @@
-## Projeto Web de Criptografia
+# Projeto Web de Criptografia
 
-## Estrutura Geral do Projeto  
-O sistema será uma aplicação web para criptografia de arquivos, com:  
+## Estrutura Geral do Projeto
 
-- **CRUD**: Gerenciamento de usuários e chaves criptográficas.  
-- **Transação**: Criptografia e descriptografia de arquivos.  
-- **Arquitetura**: Modular.  
-- **Controle de Acesso**: Login com autenticação via token JWT.  
-- **Repositório**: Git e Notion para versionamento e documentação.  
+O sistema é uma aplicação web para criptografia de arquivos, com:
 
----
-
-## Definição das Tecnologias  
-
-### **Backend (Servidor)**  
-- **Linguagem**: TypeScript (**Node.js** com **NestJS**)  
-- **Banco de Dados**: PostgreSQL  
-- **Autenticação**: JWT (JSON Web Token)  
-- **Criptografia**: Bibliotecas do Node.js (`crypto`, `bcrypt`, `jsonwebtoken`)  
+- **CRUD** de usuários
+- **Autenticação JWT**
+- **Upload de arquivos**
+- **Visualização via página web**
+- **Arquitetura modular (NestJS)**
+- **Banco de dados PostgreSQL**
+- **Testes via Postman**
 
 ---
 
-## Estrutura das Funcionalidades  
+## Tecnologias Aplicadas
 
-### **CRUD - Gerenciamento de Usuários e Chaves**  
-- Criar, editar, listar e excluir usuários.  
-- Armazenar e gerenciar chaves criptográficas associadas a cada usuário.  
-
-### **Transação - Criptografia e Descriptografia**  
-- Upload de arquivos.  
-- Download do arquivo processado.  
-
----
-
-## Requisitos Funcionais  
-
-### **Autenticação e Controle de Acesso**  
-- Cadastro de usuários com nome, e-mail e senha.  
-- Login de usuários com autenticação via JWT.  
-- Validação de permissões para funcionalidades específicas.  
-
-### **Gerenciamento de Usuários e Chaves**  
-- Criar, editar, listar e excluir usuários.  
-- Associar uma chave criptográfica a cada usuário.  
-- Armazenamento seguro das chaves criptográficas.  
-
-### **Criptografia e Descriptografia de Arquivos**  
-- Upload de arquivos para criptografia.  
-- Download do arquivo criptografado.  
-- Descriptografia de arquivos previamente criptografados.  
+- **NestJS** com **TypeScript**
+- **TypeORM** com **PostgreSQL**
+- **JWT** para autenticação
+- **Bcrypt** para hashing de senhas
+- **Multer** para upload de arquivos
+- **HTML** para interface web simples
+- **Postman** para testes de endpoints
 
 ---
 
-## Requisitos Não Funcionais  
+## Funcionalidades Implementadas (Requisitos Funcionais)
 
-### **Arquitetura e Escalabilidade**  
-- Arquitetura baseada em microserviços para escalabilidade.  
+### 🔐 Autenticação e Controle de Acesso
 
-### **Segurança**  
-- Apenas usuários autenticados podem acessar arquivos criptografados.  
+- [x] Cadastro de usuário (nome, e-mail, senha)
+- [x] Hash de senha com Bcrypt
+- [x] Login com autenticação JWT
+- [x] Proteção de rotas com token (ex: `/users`)
 
-### **Usabilidade**  
-- Interface intuitiva e amigável, facilitando o uso por diferentes níveis de usuários.  
+### 👤 Gerenciamento de Usuários
 
-### **Confiabilidade**  
-- Sistema estável e resiliente, garantindo alta disponibilidade.  
+- [x] Criar usuário
+- [x] Listar usuários
+- [x] Buscar usuário por ID
+- [x] Atualizar usuário
+- [x] Deletar usuário
 
-### **Portabilidade**  
-- Compatível com múltiplas plataformas e dispositivos.  
+### 📁 Upload e Visualização de Arquivos
 
-### **Conformidade Legal**  
-- Conformidade com LGPD (Lei Geral de Proteção de Dados - Brasil).  
+- [x] Envio de arquivos via Postman (form-data)
+- [x] Armazenamento físico local em `uploads/`
+- [x] Endpoint para listar arquivos (`GET /upload/list`)
+- [x] Página HTML com links para download (`/upload/view`)
 
 ---
 
-## 📌 Funcionalidades Implementadas
+## Interface Web Simples
 
-### ✅ CRUD de Usuários com NestJS + TypeORM + PostgreSQL
-- **POST /users** – Criação de usuários com `name`, `email` e `password`.
-- **GET /users** – Listagem de todos os usuários cadastrados.
-- **GET /users/:id** – Busca de um usuário específico por ID.
-- Dados persistidos em banco de dados **PostgreSQL** com integração via **TypeORM**.
-- Uso de **DTOs (Data Transfer Objects)** para padronização dos dados.
+- [x] Página `/upload/view` para exibir lista de arquivos enviados
+- [x] Links funcionais para baixar arquivos diretamente
 
-#### 📤 Exemplo de JSON para cadastro de usuário:
+---
 
-```json
-{
-  "name": "Lucas Vinicius",
-  "email": "lucas@email.com",
-  "password": "123456"
-}
+## Requisitos Não Funcionais Atendidos
+
+- ✅ Segurança com senhas hash e autenticação JWT
+- ✅ Modularidade (arquitetura limpa com módulos e controllers)
+- ✅ Conformidade com boas práticas de backend
+
+---
+
+## Desenvolvedores
+
+- **Lucas Vinicius Eufrasio**
+- **Sandro Machinski**
+
+## Repositório e Documentação
+
+- [Jira - CatolicaSC Team](https://catolicasc-team.atlassian.net/jira/software/projects/LS/boards/2?atlOrigin=eyJpIjoiY2Y4YjhkNGFlOTQxNGI0OTg2ZmQ5NTg4ZjYxNzhmOWEiLCJwIjoiaiJ9)
+- https://www.notion.so/1a47aeebb2ba80b6adb4ec38995c5be3?v=1a47aeebb2ba8047a5a5000caaec1ae3&pvs=4
+---
+
