@@ -1,0 +1,217 @@
+/* Reset global para todos os elementos */
+* {
+    /* Remove margens padrão */
+    margin: 0;
+    /* Remove paddings padrão */
+    padding: 0;
+    /* Faz com que padding e border não afetem as dimensões totais do elemento */
+    box-sizing: border-box;
+    /* Define a fonte padrão para todo o documento */
+    font-family: "Poppins", sans-serif;
+}
+
+/* Estilos para o corpo do documento */
+body {
+    /* Cor de fundo padrão (será sobreposta pela imagem) */
+    background: #121212;
+    /* Ocupa 100% da largura da viewport */
+    width: 100%;
+    /* Transforma o body em um flex container */
+    display: flex;
+    /* Centraliza horizontalmente */
+    justify-content: center;
+    /* Centraliza verticalmente */
+    align-items: center;
+    /* Garante altura mínima de 100% da viewport */
+    min-height: 100vh;
+    /* Define imagem de fundo */
+    background: url(img/criptografia-1080x675.jpg);
+}
+
+/* Container principal do formulário */
+.container {
+    /* Cor de fundo branca */
+    background-color: #fafafa;
+    /* Bordas arredondadas */
+    border-radius: 14px;
+    /* Margem externa */
+    margin: 14px;
+    /* Largura máxima */
+    max-width: 600px;
+    /* Ocupa 100% do espaço disponível */
+    width: 100%;
+    /* Sombra com desfoque */
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+    /* Esconde qualquer conteúdo que ultrapasse as bordas */
+    overflow: hidden;
+}
+
+.container-log{
+    background-color: #fafafa;
+    /* Bordas arredondadas */
+    border-radius: 14px;
+    /* Margem externa */
+    margin: 14px;
+    /* Largura máxima */
+    max-width: 600px;
+    /* Ocupa 100% do espaço disponível */
+    width: 100%;
+    /* Sombra com desfoque */
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+    /* Esconde qualquer conteúdo que ultrapasse as bordas */
+    overflow: hidden;
+
+}
+/* Cabeçalho do container */
+.header {
+    /* Gradiente de fundo */
+    background: linear-gradient(120deg, #3acbf0 0%, #8bb0ff 100%);
+    /* Espaçamento interno */
+    padding: 24px;
+    /* Alinhamento centralizado do texto */
+    text-align: center;
+    /* Cor do texto */
+    color: #fff;
+}
+
+/* Área do formulário */
+.form {
+    /* Espaçamento interno */
+    padding: 18px;
+}
+
+.form-content-log{
+    margin-bottom: 8px;
+    /* Padding inferior */
+    padding-bottom: 18px;
+    /* Permite posicionamento absoluto dos elementos filhos */
+    position: relative;
+
+}
+
+/* Container de cada campo do formulário */
+.form-content {
+    /* Margem inferior */
+    margin-bottom: 8px;
+    /* Padding inferior */
+    padding-bottom: 18px;
+    /* Permite posicionamento absoluto dos elementos filhos */
+    position: relative;
+}
+
+/* Estilo para labels dos campos */
+.form-content label {
+    /* Faz o label se comportar como bloco inline */
+    display: inline-block;
+    /* Margem inferior */
+    margin-bottom: 4px;
+}
+.form-log{
+    display: block;
+    /* Ocupa 100% da largura disponível */
+    width: 100%;
+    /* Bordas arredondadas */
+    border-radius: 8px;
+    /* Espaçamento interno */
+    padding: 8px;
+    /* Borda com cor cinza */
+    border: 2px solid #dfdfdf;
+}
+
+/* Estilo para inputs */
+.form-content input {
+    /* Faz o input se comportar como bloco */
+    display: block;
+    /* Ocupa 100% da largura disponível */
+    width: 100%;
+    /* Bordas arredondadas */
+    border-radius: 8px;
+    /* Espaçamento interno */
+    padding: 8px;
+    /* Borda com cor cinza */
+    border: 2px solid #dfdfdf;
+}
+
+/* Estilo para mensagens de erro (inicialmente escondidas) */
+.form-content a {
+    /* Posicionamento absoluto em relação ao form-content */
+    position: absolute;
+    /* Posiciona 8px abaixo do campo */
+    bottom: -8px;
+    /* Alinha à esquerda */
+    left: 0;
+    /* Inicialmente invisível */
+    visibility: hidden;
+}
+
+/* Estilo para botões dentro de form-content */
+.form-content button {
+    /* Cor de fundo azul */
+    background-color: #00c3ff;
+    /* Cor do texto branco */
+    color: #fff;
+}
+
+/* Estilo para botão principal do formulário */
+.form button {
+    /* Cor de fundo azul */
+    background-color: #00c3ff;
+    /* Cor do texto branco */
+    color: #fff;
+    /* Largura total */
+    width: 100%;
+    /* Bordas arredondadas */
+    border-radius: 14px;
+    /* Espaçamento interno */
+    padding: 10px;
+    /* Remove borda */
+    border: 0;
+    /* Cursor pointer ao passar o mouse */
+    cursor: pointer;
+    /* Tamanho da fonte */
+    font-size: 16px;
+    /* Margem superior */
+    margin-top: 14px;
+}
+
+/* Estilo alternativo para botão de login */
+.login button {
+    /* Mesmos estilos do botão principal */
+    background-color: #00c3ff;
+    color: #fff;
+    width: 100%;
+    border-radius: 14px;
+    padding: 10px;
+    border: 0;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 14px;
+}
+
+/* Estilo para inputs com erro */
+.form-content.error input {
+    /* Borda vermelha para indicar erro */
+    border-color: #ff0000;
+}
+
+/* Estilo para mensagens de erro quando visíveis */
+.form-content.error a {
+    /* Cor vermelha para mensagem de erro */
+    color: #ff3b25;
+    /* Torna a mensagem visível */
+    visibility: visible;
+}
+.file-upload {
+    /* Borda pontilhada */
+    border: 2px dashed #ccc;
+    /* Bordas arredondadas */
+    border-radius: 8px;
+    /* Espaçamento interno */
+    padding: 20px;
+    /* Alinhamento centralizado do texto */
+    text-align: center;
+    /* Cor de fundo cinza claro */
+    background-color: #f9f9f9;
+    /* Margem inferior */
+    margin-bottom: 15px;
+}
