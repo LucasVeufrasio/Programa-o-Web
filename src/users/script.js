@@ -1,110 +1,42 @@
-const form = document.getElementById("form");
-const username = document.getElementById("username")
-const email = document.getElementById("email")
-const password = document.getElementById("password")
-const passwordConfirmation = document.getElementById("password-confirmation");
+// Validação de Cadastro
+document.querySelector('#cadastro-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const senha = document.getElementById('senha').value;
+    const confirmaSenha = document.getElementById('confirma-senha').value;
 
+    if (senha !== confirmaSenha) {
+        alert('Senhas não coincidem!');
+        return;
+    }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+    // Envia dados para o backend
+    fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nome: document.getElementById('nome').value,
+            email: document.getElementById('email').value,
+            senha: senha
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) window.location.href = 'login.html';
+        else alert(data.message);
+    });
+});
 
-  checkForm();
-})
+// Upload de Arquivo com Criptografia
+document.querySelector('#upload-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('arquivo', document.getElementById('arquivo').files[0]);
+    formData.append('senha', document.getElementById('senha-cripto').value);
 
-email.addEventListener("blur", () => {
-  checkInputEmail();
-})
-
-
-username.addEventListener("blur", () => {
-  checkInputUsername();
-})
-
-
-function checkInputUsername(){
-  const usernameValue = username.value;
-
-  if(usernameValue === ""){
-    errorInput(username, "Preencha um username!")
-  }else{
-    const formItem = username.parentElement;
-    formItem.className = "form-content"
-  }
-
-}
-
-function checkInputEmail(){
-  const emailValue = email.value;
-
-  if(emailValue === ""){
-    errorInput(email, "O email é obrigatório.")
-  }else{
-    const formItem = email.parentElement;
-    formItem.className = "form-content"
-  }
-
-
-}
-
-
-function checkInputPassword(){
-  const passwordValue = password.value;
-
-  if(passwordValue === ""){
-    errorInput(password, "A senha é obrigatória.")
-  }else if(passwordValue.length < 8){
-    errorInput(password, "A senha precisa ter no mínimo 8 caracteres.")
-  }else{
-    const formItem = password.parentElement;
-    formItem.className = "form-content"
-  }
-
-
-}
-
-
-function checkInputPasswordConfirmation(){
-  const passwordValue = password.value;
-  const confirmationPasswordValue = passwordConfirmation.value;
-
-  if(confirmationPasswordValue === ""){
-    errorInput(passwordConfirmation, "A confirmação de senha é obrigatória.")
-  }else if(confirmationPasswordValue !== passwordValue){
-    errorInput(passwordConfirmation, "As senhas não são iguais.")
-  }else{
-    const formItem = passwordConfirmation.parentElement;
-    formItem.className = "form-content"
-  }
-
-
-}
-
-
-function checkForm(){
-  checkInputUsername();
-  checkInputEmail();
-  checkInputPassword();
-  checkInputPasswordConfirmation();
-
-  const formItems = form.querySelectorAll(".form-content")
-
-  const isValid = [...formItems].every( (item) => {
-    return item.className === "form-content"
-  });
-
-  if(isValid){
-    alert("CADASTRADO COM SUCESSO!")
-  }
-
-}
-
-
-function errorInput(input, message){
-  const formItem = input.parentElement;
-  const textMessage = formItem.querySelector("a")
-
-  textMessage.innerText = message;
-
-  formItem.className = "form-content error"
-
-}
+    const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+    });
+    const result = await response.json();
+    alert(result.message);
+});
