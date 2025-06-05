@@ -4,40 +4,51 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-
-@Injectable() 
+import { NotFoundException } from '@nestjs/common';
+@Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)  //injetando O repositório no typeORM
-    private readonly userRepository: Repository<User>, //para acessar o banco de fato
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = this.userRepository.create({
+    const newUser = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
-    return this.userRepository.save(user);
+    return this.userRepository.save(newUser);
   }
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
-
-  async findOne(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+async findOne(id: number): Promise<User> {
+  const user = await this.userRepository.findOne({ where: { id } });
+  if (!user) {
+    throw new NotFoundException(`User with id ${id} not found`);
   }
+  return user;
+}
 
-  async update(id: number, updateUserDto: Partial<User>) {
+
+  async update(id: number, updateUserDto: Partial<User>): Promise<User> {
     await this.userRepository.update(id, updateUserDto);
-    return this.userRepository.findOneBy({ id });
+    return this.findOne(id);
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<void> {
     await this.userRepository.delete(id);
-    return { message: `Usuário com ID ${id} foi removido.` };
   }
-  
-  
+
+  // 🔥🔥🔥 Adicione este método abaixo:
+  async findByEmail(email: string): Promise<User> {
+  const user = await this.userRepository.findOne({ where: { email } });
+  if (!user) {
+    throw new Error(`User with email ${email} not found`);
+  }
+  return user;
+}
+
 }

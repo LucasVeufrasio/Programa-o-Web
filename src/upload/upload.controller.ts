@@ -37,7 +37,9 @@ import {
     @Get('list')
     listFiles() {
       const directoryPath = join(__dirname, '..', '..', 'uploads');
-      const files = fs.readdirSync(directoryPath);
+      const files = fs.readdirSync(directoryPath, { withFileTypes: true })
+      .filter(file => file.isFile())
+      .map(file => file.name);
       return files;
     }
   

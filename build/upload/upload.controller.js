@@ -60,7 +60,9 @@ let UploadController = class UploadController {
     }
     listFiles() {
         const directoryPath = (0, path_1.join)(__dirname, '..', '..', 'uploads');
-        const files = fs.readdirSync(directoryPath);
+        const files = fs.readdirSync(directoryPath, { withFileTypes: true })
+            .filter(file => file.isFile())
+            .map(file => file.name);
         return files;
     }
     viewPage(res) {

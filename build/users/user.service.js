@@ -51,6 +51,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const user_entity_1 = require("./user.entity");
 const bcrypt = __importStar(require("bcrypt"));
+const common_2 = require("@nestjs/common");
 let UserService = class UserService {
     userRepository;
     constructor(userRepository) {
@@ -58,25 +59,36 @@ let UserService = class UserService {
     }
     async create(createUserDto) {
         const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        const user = this.userRepository.create({
+        const newUser = this.userRepository.create({
             ...createUserDto,
             password: hashedPassword,
         });
-        return this.userRepository.save(user);
+        return this.userRepository.save(newUser);
     }
     async findAll() {
         return this.userRepository.find();
     }
     async findOne(id) {
-        return this.userRepository.findOneBy({ id });
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) {
+            throw new common_2.NotFoundException(`User with id ${id} not found`);
+        }
+        return user;
     }
     async update(id, updateUserDto) {
         await this.userRepository.update(id, updateUserDto);
-        return this.userRepository.findOneBy({ id });
+        return this.findOne(id);
     }
     async remove(id) {
         await this.userRepository.delete(id);
-        return { message: `Usuário com ID ${id} foi removido.` };
+    }
+    // 🔥🔥🔥 Adicione este método abaixo:
+    async findByEmail(email) {
+        const user = await this.userRepository.findOne({ where: { email } });
+        if (!user) {
+            throw new Error(`User with email ${email} not found`);
+        }
+        return user;
     }
 };
 exports.UserService = UserService;
