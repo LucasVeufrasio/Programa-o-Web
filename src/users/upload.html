@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Arquivos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Criptografar Arquivo</h1>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="file" id="arquivo" name="arquivo" required>
+            <input type="password" placeholder="Senha de Criptografia" required>
+            <button type="submit">Criptografar</button>
+        </form>
+        <p><a href="login.html">Voltar</a></p>
+    </div>
+</body>
+</html>
