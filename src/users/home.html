@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DataCrypt - Painel</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="layout">
+    <!-- Menu Lateral -->
+    <aside class="sidebar">
+      <h2>DataCrypt</h2>
+      <nav>
+        <ul>
+          <li><strong>Dashboard</strong></li>
+          <li><a href="upload.html">Upload de Arquivos</a></li>
+          <li><a href="login.html">Sair</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-content">
+          <input type="text" placeholder="Pesquisar histórico..." class="search-bar" />
+          <div class="user-info">
+            <img src="https://www.gravatar.com/avatar?d=mp" alt="avatar" class="user-avatar" />
+            <span class="user-name">Lucas</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Alerta de sucesso -->
+      <div id="success-message" style="display:none; background: #d4edda; color: #155724; padding: 10px; border: 1px solid #c3e6cb; border-radius: 5px; margin: 20px; font-weight: bold;">
+        ✅ Arquivo enviado com sucesso!
+      </div>
+
+      <section class="email-list">
+        <h1>Arquivos Enviados</h1>
+        <ul id="history-list" class="email-table">
+          <li class="header">
+            <span>Arquivo</span>
+            <span>Destinatário</span>
+            <span>Senha</span>
+            <span>Data</span>
+          </li>
+          <li><span>Carregando...</span></li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Exibe mensagem de sucesso se vier com ?status=success
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'success') {
+      const msg = document.getElementById('success-message');
+      msg.style.display = 'block';
+      setTimeout(() => msg.style.display = 'none', 5000);
+    }
+
+    // Carrega histórico
+    fetch('http://localhost:3000/upload/history')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('history-list');
+        list.innerHTML = `
+          <li class="header">
+            <span>Arquivo</span>
+            <span>Destinatário</span>
+            <span>Senha</span>
+            <span>Data</span>
+          </li>
+        `;
+
+        if (data.length === 0) {
+          list.innerHTML += `<li><span>Nenhum arquivo enviado ainda.</span></li>`;
+        } else {
+          data.forEach(item => {
+            list.innerHTML += `
+              <li>
+                <span><a href="/files/${item.filename}" download>${item.filename}</a></span>
+                <span>${item.email}</span>
+                <span>${item.senha}</span>
+                <span>${new Date(item.created_at).toLocaleString('pt-BR')}</span>
+              </li>
+            `;
+          });
+        }
+      });
+  </script>
+</body>
+</html>

@@ -51,19 +51,55 @@ const platform_express_1 = require("@nestjs/platform-express");
 const multer_1 = require("multer");
 const path_1 = require("path");
 const fs = __importStar(require("fs"));
+const upload_service_1 = require("./upload.service");
 let UploadController = class UploadController {
-    uploadFile(file) {
-        return {
-            message: 'Arquivo enviado com sucesso!',
-            filename: file.filename,
-        };
+    uploadService;
+    constructor(uploadService) {
+        this.uploadService = uploadService;
+    }
+    async uploadFile(file, email, senha) {
+        try {
+            if (!file) {
+                throw new common_1.HttpException('Arquivo não enviado', common_1.HttpStatus.BAD_REQUEST);
+            }
+            if (!email || !senha) {
+                throw new common_1.HttpException('Email e senha são obrigatórios', common_1.HttpStatus.BAD_REQUEST);
+            }
+            const saved = await this.uploadService.create({
+                filename: file.filename,
+                email,
+                senha,
+            });
+            return {
+                message: 'Arquivo enviado com sucesso!',
+                filename: saved.filename,
+                emailDestino: saved.email,
+                id: saved.id,
+            };
+        }
+        catch (error) {
+            console.error('Erro no upload:', error); // <-- essencial para debug
+            throw new common_1.HttpException({
+                message: 'Erro ao processar upload',
+                error: error.message || error,
+            }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     listFiles() {
         const directoryPath = (0, path_1.join)(__dirname, '..', '..', 'uploads');
-        const files = fs.readdirSync(directoryPath, { withFileTypes: true })
-            .filter(file => file.isFile())
-            .map(file => file.name);
-        return files;
+        try {
+            const files = fs.readdirSync(directoryPath, { withFileTypes: true })
+                .filter(file => file.isFile())
+                .map(file => file.name);
+            return files;
+        }
+        catch (err) {
+            console.error('Erro ao ler diretório:', err);
+            throw new common_1.HttpException('Erro ao listar arquivos', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    async getUploadHistory() {
+        return this.uploadService.findAll();
     }
     viewPage(res) {
         res.sendFile((0, path_1.join)(process.cwd(), 'src', 'upload', 'upload.html'));
@@ -74,7 +110,14 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
-            destination: './uploads',
+            destination: (req, file, callback) => {
+                const dir = './uploads';
+                // Garante que o diretório existe
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+                callback(null, dir);
+            },
             filename: (req, file, callback) => {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
                 const ext = (0, path_1.extname)(file.originalname);
@@ -83,9 +126,11 @@ __decorate([
         }),
     })),
     __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Body)('email')),
+    __param(2, (0, common_1.Body)('senha')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:returntype", Promise)
 ], UploadController.prototype, "uploadFile", null);
 __decorate([
     (0, common_1.Get)('list'),
@@ -94,6 +139,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UploadController.prototype, "listFiles", null);
 __decorate([
+    (0, common_1.Get)('history'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UploadController.prototype, "getUploadHistory", null);
+__decorate([
     (0, common_1.Get)('view'),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -101,5 +152,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UploadController.prototype, "viewPage", null);
 exports.UploadController = UploadController = __decorate([
-    (0, common_1.Controller)('upload')
+    (0, common_1.Controller)('upload'),
+    __metadata("design:paramtypes", [upload_service_1.UploadService])
 ], UploadController);

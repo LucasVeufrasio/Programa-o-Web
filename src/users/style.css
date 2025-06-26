@@ -81,3 +81,90 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #f2f4f7;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  margin: 15px 0;
+}
+
+.sidebar nav ul li a {
+  text-decoration: none;
+  color: #333;
+}
+
+.sidebar nav ul li strong {
+  color: #0066cc;
+}
+
+/* Main Content */
+.main-content {
+  flex-grow: 1;
+  padding: 20px 40px;
+  background-color: #fff;
+}
+
+.topbar {
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* Email list (simula Gmail) */
+.email-list {
+  background-color: #fafafa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.email-list h1 {
+  padding: 10px 20px;
+  margin: 0;
+  background: #e3e3e3;
+  font-size: 20px;
+}
+
+.email-table {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.email-table li {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 2fr;
+  padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.email-table li.header {
+  background-color: #e9ecef;
+  font-weight: bold;
+}

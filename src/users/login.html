@@ -9,12 +9,42 @@
 <body>
     <div class="container">
         <h1>Login DataCrypt</h1>
-        <form action="/login" method="POST">
-            <input type="email" placeholder="E-mail" required>
-            <input type="password" placeholder="Senha" required>
+        <form id="login-form">
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input type="password" name="password" placeholder="Senha" required>
             <button type="submit">Entrar</button>
         </form>
         <p>Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
     </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target.email.value;
+            const password = e.target.password.value;
+
+            try {
+                const response = await fetch('http://localhost:3000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Se quiser armazenar o email para exibir na home
+                    localStorage.setItem('email', email);
+
+                    // Redireciona para a tela home
+                    window.location.href = 'home.html';
+                } else {
+                    alert('Erro: ' + (data.message || 'Falha ao fazer login'));
+                }
+            } catch (err) {
+                alert('Erro de conexão com o servidor.');
+            }
+        });
+    </script>
 </body>
 </html>

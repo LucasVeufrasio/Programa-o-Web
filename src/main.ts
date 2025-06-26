@@ -6,12 +6,20 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.enableCors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+});
+
+
+  // Serve arquivos estáticos da pasta /uploads
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/files/', // agora os arquivos estarão disponíveis em /files/arquivo.ext
+    prefix: '/files/',
   });
 
- await app.listen(3000);
-console.log(`🚀 Server is running at http://localhost:3000`);
-
+  await app.listen(3000);
+  console.log(`🚀 Server is running at http://localhost:3000`);
 }
 bootstrap();

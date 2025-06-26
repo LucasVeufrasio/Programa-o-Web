@@ -13,6 +13,7 @@ const user_module_1 = require("./users/user.module");
 const user_entity_1 = require("./users/user.entity");
 const auth_module_1 = require("./auth/auth.module");
 const upload_module_1 = require("./upload/upload.module");
+const upload_entity_1 = require("./upload/upload.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,7 +29,7 @@ exports.AppModule = AppModule = __decorate([
                 username: 'postgres',
                 password: '123',
                 database: 'programacao_web',
-                entities: [user_entity_1.User],
+                entities: [user_entity_1.User, upload_entity_1.Upload],
                 synchronize: true,
             }),
             user_module_1.UserModule,

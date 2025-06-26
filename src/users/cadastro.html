@@ -9,14 +9,52 @@
 <body>
     <div class="container">
         <h1>Cadastro</h1>
-        <form action="/register" method="POST">
-            <input type="text" placeholder="Nome Completo" required>
-            <input type="email" placeholder="E-mail" required>
-            <input type="password" placeholder="Senha" required>
-            <input type="password" placeholder="Confirme sua Senha" required>
+        <form id="register-form">
+            <input type="text" name="name" placeholder="Nome Completo" required>
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <input type="password" name="confirmPassword" placeholder="Confirme sua Senha" required>
             <button type="submit">Cadastrar</button>
         </form>
         <p>Já tem conta? <a href="login.html">Faça Login</a></p>
     </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            const name = form.name.value;
+            const email = form.email.value;
+            const password = form.password.value;
+            const confirmPassword = form.confirmPassword.value;
+
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem.');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert('Cadastro realizado com sucesso!');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Erro: ' + (data.message || 'Falha ao cadastrar'));
+                }
+            } catch (err) {
+                alert('Erro de conexão com o servidor.');
+            }
+        });
+    </script>
 </body>
 </html>

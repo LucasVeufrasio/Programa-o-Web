@@ -4,6 +4,7 @@ import { UserModule } from './users/user.module';
 import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { Upload } from './upload/upload.entity';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { UploadModule } from './upload/upload.module';
       username: 'postgres',
       password: '123',
       database: 'programacao_web',
-      entities: [User],
+      entities: [User, Upload],
       synchronize: true,
     }),
     UserModule, 
