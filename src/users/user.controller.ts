@@ -9,20 +9,21 @@ import {
   UseGuards, 
   Req, 
   HttpException, 
-  HttpStatus 
+  HttpStatus, 
+  UnauthorizedException 
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from './user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UploadService } from '../upload/upload.service'; // importar!
+import { UploadService } from '../upload/upload.service';
 import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly uploadService: UploadService  // injetar!
+    private readonly uploadService: UploadService
   ) {}
 
   @Post()
@@ -33,9 +34,16 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('history')
   async getUploadHistory(@Req() req: Request) {
+    const user = req.user as any;
+    if (!user || !user.id) {
+      throw new UnauthorizedException('Token JWT inválido ou expirado');
+    }
+    const userId = Number(user.id);
+    if (isNaN(userId)) {
+      throw new UnauthorizedException('ID de usuário inválido no token');
+    }
+
     try {
-      const user = req.user as any;
-      const userId = user?.sub; // geralmente sub no payload JWT
       return await this.uploadService.findByUser(userId);
     } catch (error) {
       console.error('Erro ao buscar histórico:', error);
@@ -51,14 +59,27 @@ export class UserController {
   findAll() {
     return this.userService.findAll();
   }
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Req() req: Request) {
-   const user = req.user as any;
-   const userId = user.sub; // do JWT
-   return this.userService.findOne(userId);
-}
+    const user = req.user as any;
+    if (!user || !user.id) {
+      throw new UnauthorizedException('Token JWT inválido ou expirado');
+    }
+    const userId = Number(user.id);
+    if (isNaN(userId)) {
+      throw new UnauthorizedException('ID de usuário inválido no token');
+    }
 
+    const found = await this.userService.findOne(userId);
+
+    return {
+      id: found.id,
+      name: found.name,
+      email: found.email,
+    };
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

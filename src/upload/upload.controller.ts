@@ -56,8 +56,7 @@ export class UploadController {
     try {
      const user = req.user as any;
       console.log('req.user:', user);
-      const userId = user.id;
-
+      const userId = Number(user.id);
       if (!userId) {
         throw new HttpException('Usuário não identificado no token', HttpStatus.UNAUTHORIZED);
       }

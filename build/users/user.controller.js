@@ -17,12 +17,11 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("../dto/create-user.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const upload_service_1 = require("../upload/upload.service"); // importar!
+const upload_service_1 = require("../upload/upload.service");
 let UserController = class UserController {
     userService;
     uploadService;
-    constructor(userService, uploadService // injetar!
-    ) {
+    constructor(userService, uploadService) {
         this.userService = userService;
         this.uploadService = uploadService;
     }
@@ -30,9 +29,15 @@ let UserController = class UserController {
         return this.userService.create(createUserDto);
     }
     async getUploadHistory(req) {
+        const user = req.user;
+        if (!user || !user.id) {
+            throw new common_1.UnauthorizedException('Token JWT inválido ou expirado');
+        }
+        const userId = Number(user.id);
+        if (isNaN(userId)) {
+            throw new common_1.UnauthorizedException('ID de usuário inválido no token');
+        }
         try {
-            const user = req.user;
-            const userId = user?.sub; // geralmente sub no payload JWT
             return await this.uploadService.findByUser(userId);
         }
         catch (error) {
@@ -45,8 +50,19 @@ let UserController = class UserController {
     }
     async getProfile(req) {
         const user = req.user;
-        const userId = user.sub; // do JWT
-        return this.userService.findOne(userId);
+        if (!user || !user.id) {
+            throw new common_1.UnauthorizedException('Token JWT inválido ou expirado');
+        }
+        const userId = Number(user.id);
+        if (isNaN(userId)) {
+            throw new common_1.UnauthorizedException('ID de usuário inválido no token');
+        }
+        const found = await this.userService.findOne(userId);
+        return {
+            id: found.id,
+            name: found.name,
+            email: found.email,
+        };
     }
     findOne(id) {
         return this.userService.findOne(Number(id));
@@ -114,6 +130,5 @@ __decorate([
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UserService,
-        upload_service_1.UploadService // injetar!
-    ])
+        upload_service_1.UploadService])
 ], UserController);

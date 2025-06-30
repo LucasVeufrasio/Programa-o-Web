@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login DataCrypt</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <div class="container">
-        <h1>Login DataCrypt</h1>
-        <form id="login-form">
-            <input type="email" name="email" placeholder="E-mail" required>
-            <input type="password" name="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
-        </form>
-        <p>Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+<body class="centered">
+  <div class="login-container">
+    <h1>Login</h1>
+    <form id="login-form">
+      <input type="email" name="email" placeholder="Seu e-mail" required>
+      <input type="password" name="password" placeholder="Sua senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="register-link">
+      Ainda não tem conta? <a href="cadastro.html">Cadastre-se</a>
     </div>
+  </div>
 
-    <script>
+  <script>
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = e.target.email.value;
@@ -33,16 +35,8 @@
             const data = await response.json();
 
             if (response.ok) {
-                // salva token no localStorage
                 localStorage.setItem('token', data.access_token);
-                
-                // salva também o email para mostrar na home se quiser
                 localStorage.setItem('email', email);
-
-                console.log(localStorage.getItem("token"))
-
-
-                // redireciona
                 window.location.href = 'home.html';
             } else {
                 alert('Erro: ' + (data.message || 'Falha ao fazer login'));
@@ -51,6 +45,6 @@
             alert('Erro de conexão com o servidor.');
         }
     });
-</script>
+  </script>
 </body>
 </html>

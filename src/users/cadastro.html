@@ -1,60 +1,60 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro DataCrypt</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-    <div class="container">
-        <h1>Cadastro</h1>
-        <form id="register-form">
-            <input type="text" name="name" placeholder="Nome Completo" required>
-            <input type="email" name="email" placeholder="E-mail" required>
-            <input type="password" name="password" placeholder="Senha" required>
-            <input type="password" name="confirmPassword" placeholder="Confirme sua Senha" required>
-            <button type="submit">Cadastrar</button>
-        </form>
-        <p>Já tem conta? <a href="login.html">Faça Login</a></p>
+<body class="centered">
+  <div class="register-container">
+    <h1>Cadastro</h1>
+    <form id="register-form">
+      <input type="text" name="name" placeholder="Nome completo" required />
+      <input type="email" name="email" placeholder="Seu e-mail" required />
+      <input type="password" name="password" placeholder="Senha" required />
+      <input type="password" name="confirmPassword" placeholder="Confirme sua senha" required />
+      <button type="submit">Cadastrar</button>
+    </form>
+    <div class="login-link">
+      Já tem conta? <a href="login.html">Faça Login</a>
     </div>
+  </div>
 
-    <script>
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+  <script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-            const form = e.target;
-            const name = form.name.value;
-            const email = form.email.value;
-            const password = form.password.value;
-            const confirmPassword = form.confirmPassword.value;
+      const form = e.target;
+      const name = form.name.value;
+      const email = form.email.value;
+      const password = form.password.value;
+      const confirmPassword = form.confirmPassword.value;
 
-            if (password !== confirmPassword) {
-                alert('As senhas não coincidem.');
-                return;
-            }
+      if (password !== confirmPassword) {
+        alert('As senhas não coincidem.');
+        return;
+      }
 
-            try {
-                const res = await fetch('http://localhost:3000/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, password })
-                });
-
-                const data = await res.json();
-
-                if (res.ok) {
-                    alert('Cadastro realizado com sucesso!');
-                    window.location.href = 'login.html';
-                } else {
-                    alert('Erro: ' + (data.message || 'Falha ao cadastrar'));
-                }
-            } catch (err) {
-                alert('Erro de conexão com o servidor.');
-            }
+      try {
+        const res = await fetch('http://localhost:3000/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
         });
-    </script>
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert('Cadastro realizado com sucesso!');
+          window.location.href = 'login.html';
+        } else {
+          alert('Erro: ' + (data.message || 'Falha ao cadastrar'));
+        }
+      } catch (err) {
+        alert('Erro de conexão com o servidor.');
+      }
+    });
+  </script>
 </body>
 </html>

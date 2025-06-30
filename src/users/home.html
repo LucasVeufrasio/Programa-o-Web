@@ -108,30 +108,30 @@
       window.location.href = "login.html";
     }
 
-    // alerta dinâmico
     function mostrarAlerta(msg, tipo) {
       const el = document.getElementById("alert");
       el.textContent = msg;
       el.className = "alert";
-      if (tipo === "success") {
-        el.classList.add("alert-success");
-      } else {
-        el.classList.add("alert-error");
-      }
+      el.classList.add(tipo === "success" ? "alert-success" : "alert-error");
       el.style.display = "block";
       setTimeout(() => { el.style.display = "none"; }, 4000);
     }
 
-    // buscar nome
+    // carregar perfil
     fetch('http://127.0.0.1:3000/users/profile', {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(response => response.json())
     .then(data => {
-      document.getElementById('user-name').innerText = data.name;
+      console.log("🚀 profile recebido:", data);
+      if (data.name) {
+        document.getElementById('user-name').innerText = data.name;
+      } else {
+        document.getElementById('user-name').innerText = "Usuário";
+      }
     })
     .catch(() => {
-      document.getElementById('user-name').innerText = 'Usuário';
+      document.getElementById('user-name').innerText = "Usuário";
     });
 
     // carregar histórico
@@ -140,6 +140,7 @@
     })
     .then(res => res.json())
     .then(data => {
+      console.log("🚀 histórico recebido:", data);
       const list = document.getElementById('history-list');
       list.innerHTML = `
         <li class="header">
@@ -149,7 +150,7 @@
           <span>Data</span>
         </li>
       `;
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         list.innerHTML += `<li><span>Nenhum arquivo enviado ainda.</span></li>`;
       } else {
         data.forEach(item => {
@@ -168,14 +169,13 @@
         });
       }
 
-      // clique no link para validar senha
+      // ativar links de download
       document.querySelectorAll(".download-link").forEach(link => {
         link.addEventListener("click", async (e) => {
           e.preventDefault();
           const senhaInformada = prompt("Digite a senha para desbloqueio:");
           if (!senhaInformada) return;
           const id = link.dataset.id;
-
           try {
             const resp = await fetch(`http://127.0.0.1:3000/upload/validate-download`, {
               method: "POST",
@@ -187,8 +187,7 @@
             });
             const result = await resp.json();
             if (resp.ok && result.allowed) {
-              // autorizado
-              window.location.href = `/files/${link.dataset.filename}`;
+              window.location.href = `/files/${link.dataset.filename}.zip`;
             } else {
               mostrarAlerta("Senha incorreta!", "error");
             }
@@ -197,7 +196,11 @@
           }
         });
       });
-
+    })
+    .catch(err => {
+      console.error("Erro ao buscar histórico:", err);
+      const list = document.getElementById('history-list');
+      list.innerHTML += `<li><span>Erro ao carregar histórico.</span></li>`;
     });
 
     // popup
@@ -209,7 +212,7 @@
       document.getElementById("upload-popup").style.display = "none";
     });
 
-    // submit do upload
+    // upload
     document.getElementById("upload-form").addEventListener("submit", async e => {
       e.preventDefault();
       const file = e.target.file.files[0];
@@ -225,16 +228,16 @@
         const response = await fetch('http://127.0.0.1:3000/upload', {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
-          body: formData,
+          body: formData
         });
         if (response.ok) {
-          mostrarAlerta("Sucesso ao Enviar", "success");
-          setTimeout(() => window.location.reload(), 2000);
+          mostrarAlerta("Arquivo enviado com sucesso!", "success");
+          setTimeout(() => window.location.reload(), 1500);
         } else {
-          mostrarAlerta("Erro ao enviar", "error");
+          mostrarAlerta("Erro ao enviar o arquivo", "error");
         }
       } catch {
-        mostrarAlerta("Erro ao enviar", "error");
+        mostrarAlerta("Erro ao enviar o arquivo", "error");
       }
     });
   </script>
