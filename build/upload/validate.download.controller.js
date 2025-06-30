@@ -48,7 +48,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ValidateDownloadController = void 0;
 const common_1 = require("@nestjs/common");
 const upload_service_1 = require("./upload.service");
-const zip_service_1 = require("../utils/zip.service"); // ajuste o caminho se precisar
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
 let ValidateDownloadController = class ValidateDownloadController {
@@ -62,31 +61,25 @@ let ValidateDownloadController = class ValidateDownloadController {
         if (isNaN(fileId) || !senha) {
             throw new common_1.HttpException('Dados inválidos', common_1.HttpStatus.BAD_REQUEST);
         }
-        const result = await this.uploadService.validateDownload(fileId, senha);
-        if (!result) {
+        const isValid = await this.uploadService.validateDownload(fileId, senha);
+        if (!isValid) {
             throw new common_1.HttpException('Senha inválida', common_1.HttpStatus.UNAUTHORIZED);
         }
-        // buscar info do arquivo para zipar
+        // busca info
         const arquivoInfo = await this.uploadService.findById(fileId);
         if (!arquivoInfo) {
             throw new common_1.HttpException('Arquivo não encontrado', common_1.HttpStatus.NOT_FOUND);
         }
-        const arquivoPath = path.join(process.cwd(), 'uploads', arquivoInfo.filename);
-        if (!fs.existsSync(arquivoPath)) {
-            throw new common_1.HttpException('Arquivo físico não encontrado', common_1.HttpStatus.NOT_FOUND);
+        // o nome do zip
+        const zipFileName = arquivoInfo.filename + '.zip';
+        const zipPath = path.join(process.cwd(), 'uploads', zipFileName);
+        if (!fs.existsSync(zipPath)) {
+            throw new common_1.HttpException('Arquivo zip não encontrado', common_1.HttpStatus.NOT_FOUND);
         }
-        // zipar o arquivo
-        try {
-            const zipPath = await zip_service_1.ZipService.ziparArquivoComSenha(arquivoPath, senha);
-            return {
-                allowed: true,
-                zipFile: `/files/${path.basename(zipPath)}` // o frontend vai baixar esse .zip
-            };
-        }
-        catch (err) {
-            console.error('Erro ao zipar:', err);
-            throw new common_1.HttpException('Erro ao gerar arquivo zip', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return {
+            allowed: true,
+            zipFile: `/files/${zipFileName}`
+        };
     }
 };
 exports.ValidateDownloadController = ValidateDownloadController;

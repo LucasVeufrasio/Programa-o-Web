@@ -6,7 +6,6 @@ import {
   HttpStatus 
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { ZipService } from '../utils/zip.service'; // ajuste o caminho se precisar
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -23,34 +22,28 @@ export class ValidateDownloadController {
       throw new HttpException('Dados inválidos', HttpStatus.BAD_REQUEST);
     }
 
-    const result = await this.uploadService.validateDownload(fileId, senha);
-
-    if (!result) {
+    const isValid = await this.uploadService.validateDownload(fileId, senha);
+    if (!isValid) {
       throw new HttpException('Senha inválida', HttpStatus.UNAUTHORIZED);
     }
 
-    // buscar info do arquivo para zipar
+    // busca info
     const arquivoInfo = await this.uploadService.findById(fileId);
     if (!arquivoInfo) {
       throw new HttpException('Arquivo não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    const arquivoPath = path.join(process.cwd(), 'uploads', arquivoInfo.filename);
+    // o nome do zip
+    const zipFileName = arquivoInfo.filename + '.zip';
+    const zipPath = path.join(process.cwd(), 'uploads', zipFileName);
 
-    if (!fs.existsSync(arquivoPath)) {
-      throw new HttpException('Arquivo físico não encontrado', HttpStatus.NOT_FOUND);
+    if (!fs.existsSync(zipPath)) {
+      throw new HttpException('Arquivo zip não encontrado', HttpStatus.NOT_FOUND);
     }
 
-    // zipar o arquivo
-    try {
-      const zipPath = await ZipService.ziparArquivoComSenha(arquivoPath, senha);
-      return {
-        allowed: true,
-        zipFile: `/files/${path.basename(zipPath)}`  // o frontend vai baixar esse .zip
-      };
-    } catch (err) {
-      console.error('Erro ao zipar:', err);
-      throw new HttpException('Erro ao gerar arquivo zip', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return {
+      allowed: true,
+      zipFile: `/files/${zipFileName}`
+    };
   }
 }

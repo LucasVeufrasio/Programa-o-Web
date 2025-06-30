@@ -85,19 +85,28 @@
   </div>
 
   <!-- popup de upload -->
-  <div id="upload-popup" class="upload-popup">
-    <div class="upload-popup-content">
-      <h2>Criptografar Arquivo</h2>
-      <form id="upload-form">
+<div id="upload-popup" class="upload-popup">
+  <div class="upload-popup-content">
+    <h2 style="text-align: center; margin-bottom: 1rem;">Criptografar Arquivo</h2>
+    <form id="upload-form" class="upload-form">
+      <div class="form-group">
+        <label>Arquivo</label>
         <input type="file" name="file" required />
-        <label for="senha">Senha para desbloqueio do destinatário</label>
-        <input type="password" id="senha" name="senha" placeholder="Senha" required />
-        <input type="email" name="email" placeholder="Destinatário" required />
-        <button type="submit">Criptografar</button>
-        <button type="button" id="close-upload">Fechar</button>
-      </form>
-    </div>
+      </div>
+      <div class="form-group">
+        <label>Senha de desbloqueio</label>
+        <input type="password" name="senha" placeholder="Senha" required />
+      </div>
+      <div class="form-group">
+        <label>E-mail do destinatário</label>
+        <input type="email" name="email" placeholder="ex: exemplo@email.com" required />
+      </div>
+      <button type="submit" class="btn-primary">Criptografar</button>
+      <button type="button" id="close-upload" class="btn-secondary">Fechar</button>
+    </form>
   </div>
+</div>
+
 
   <!-- alerta -->
   <div id="alert" class="alert"></div>
@@ -169,33 +178,39 @@
         });
       }
 
-      // ativar links de download
-      document.querySelectorAll(".download-link").forEach(link => {
-        link.addEventListener("click", async (e) => {
-          e.preventDefault();
-          const senhaInformada = prompt("Digite a senha para desbloqueio:");
-          if (!senhaInformada) return;
-          const id = link.dataset.id;
-          try {
-            const resp = await fetch(`http://127.0.0.1:3000/upload/validate-download`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ id, senha: senhaInformada })
-            });
-            const result = await resp.json();
-            if (resp.ok && result.allowed) {
-              window.location.href = `/files/${link.dataset.filename}.zip`;
-            } else {
-              mostrarAlerta("Senha incorreta!", "error");
-            }
-          } catch {
-            mostrarAlerta("Erro ao validar senha", "error");
-          }
-        });
+// ativar links de download
+document.querySelectorAll(".download-link").forEach(link => {
+  link.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const senhaInformada = prompt("Digite a senha para desbloqueio:");
+    if (!senhaInformada) return;
+
+    const id = link.dataset.id;
+
+    try {
+      const resp = await fetch(`http://127.0.0.1:3000/validate-download`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id, senha: senhaInformada })
       });
+
+      const result = await resp.json();
+
+      if (resp.ok && result.allowed) {
+        // agora baixa o zip já pronto
+        window.location.href = result.zipFile;
+      } else {
+        mostrarAlerta("Senha incorreta!", "error");
+      }
+    } catch {
+      mostrarAlerta("Erro ao validar senha", "error");
+    }
+  });
+});
+
     })
     .catch(err => {
       console.error("Erro ao buscar histórico:", err);
