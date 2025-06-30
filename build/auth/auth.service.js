@@ -54,16 +54,19 @@ let AuthService = class AuthService {
         this.userService = userService;
         this.jwtService = jwtService;
     }
-    async validateUser(loginDto) {
+    async validateUser(email, password) {
         const users = await this.userService.findAll();
-        const user = users.find(u => u.email === loginDto.email);
-        if (user && (await bcrypt.compare(loginDto.password, user.password))) {
-            const payload = { sub: user.id, email: user.email };
-            return {
-                access_token: this.jwtService.sign(payload),
-            };
+        const user = users.find(u => u.email === email);
+        if (user && (await bcrypt.compare(password, user.password))) {
+            return user; // apenas devolve o user
         }
         return null;
+    }
+    async login(user) {
+        const payload = { sub: user.id, email: user.email };
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
     }
 };
 exports.AuthService = AuthService;

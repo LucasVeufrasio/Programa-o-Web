@@ -12,12 +12,16 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_entity_1 = require("./user.entity");
 const user_service_1 = require("./user.service");
 const user_controller_1 = require("./user.controller");
+const upload_module_1 = require("../upload/upload.module"); // ADICIONE ESTA LINHA
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([user_entity_1.User])],
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([user_entity_1.User]),
+            upload_module_1.UploadModule // ADICIONE AQUI também
+        ],
         providers: [user_service_1.UserService],
         controllers: [user_controller_1.UserController],
         exports: [user_service_1.UserService],

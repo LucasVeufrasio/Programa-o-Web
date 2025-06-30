@@ -14,12 +14,14 @@ const user_entity_1 = require("./users/user.entity");
 const auth_module_1 = require("./auth/auth.module");
 const upload_module_1 = require("./upload/upload.module");
 const upload_entity_1 = require("./upload/upload.entity");
+const mail_module_1 = require("./mail/mail.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            mail_module_1.MailModule,
             upload_module_1.UploadModule,
             auth_module_1.AuthModule,
             typeorm_1.TypeOrmModule.forRoot({

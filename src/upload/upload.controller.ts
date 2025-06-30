@@ -4,29 +4,36 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-  Res,
   Body,
   HttpException,
   HttpStatus,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import * as fs from 'fs';
-import { Response } from 'express';
 import { UploadService } from './upload.service';
+import { AuthGuard } from '@nestjs/passport';
+import { MailService } from '../mail/mail.service';
+import { ZipService } from '../utils/zip.service';
+import * as path from 'path';
 
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly uploadService: UploadService,
+    private readonly mailService: MailService,
+  ) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, callback) => {
           const dir = './uploads';
-          // Garante que o diretório existe
           if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
           }
@@ -44,29 +51,70 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Body('email') email: string,
     @Body('senha') senha: string,
+    @Req() req: any,
   ) {
     try {
+     const user = req.user as any;
+      console.log('req.user:', user);
+      const userId = user.id;
+
+      if (!userId) {
+        throw new HttpException('Usuário não identificado no token', HttpStatus.UNAUTHORIZED);
+      }
+
+
+
+
       if (!file) {
         throw new HttpException('Arquivo não enviado', HttpStatus.BAD_REQUEST);
       }
       if (!email || !senha) {
-        throw new HttpException('Email e senha são obrigatórios', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Todos os campos são obrigatórios', HttpStatus.BAD_REQUEST);
       }
 
+      // salva no banco
       const saved = await this.uploadService.create({
         filename: file.filename,
         email,
         senha,
+        userId,
       });
 
+      // gera zip protegido
+      const arquivoOriginalPath = join(process.cwd(), 'uploads', file.filename);
+      const zipPath = await ZipService.ziparArquivoComSenha(arquivoOriginalPath, senha);
+
+      try {
+        await fs.promises.unlink(arquivoOriginalPath);
+        console.log('Arquivo original removido com sucesso');
+      } catch (err) {
+        console.error('Erro ao remover o arquivo original:', err);
+      }
+
+
+
+    await this.mailService.sendMail(
+        email,
+        'Arquivo criptografado',
+        'Segue o arquivo zipado. Para abrir, use a senha informada no app.',
+        [
+          {
+          filename: path.basename(zipPath),
+          path: zipPath,
+          },
+        ]
+      );
+
+
+
       return {
-        message: 'Arquivo enviado com sucesso!',
+        message: 'Arquivo criptografado e enviado com sucesso!',
         filename: saved.filename,
         emailDestino: saved.email,
         id: saved.id,
       };
     } catch (error: any) {
-      console.error('Erro no upload:', error); // <-- essencial para debug
+      console.error('Erro no upload controller:', error);
       throw new HttpException(
         {
           message: 'Erro ao processar upload',
@@ -77,27 +125,19 @@ export class UploadController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('list')
   listFiles() {
-    const directoryPath = join(__dirname, '..', '..', 'uploads');
+    const directoryPath = join(process.cwd(), 'uploads');
     try {
-      const files = fs.readdirSync(directoryPath, { withFileTypes: true })
-        .filter(file => file.isFile())
-        .map(file => file.name);
+      const files = fs
+        .readdirSync(directoryPath, { withFileTypes: true })
+        .filter((file) => file.isFile())
+        .map((file) => file.name);
       return files;
     } catch (err) {
       console.error('Erro ao ler diretório:', err);
       throw new HttpException('Erro ao listar arquivos', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  @Get('history')
-  async getUploadHistory() {
-    return this.uploadService.findAll();
-  }
-
-  @Get('view')
-  viewPage(@Res() res: Response) {
-    res.sendFile(join(process.cwd(), 'src', 'upload', 'upload.html'));
   }
 }

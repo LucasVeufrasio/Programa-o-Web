@@ -22,11 +22,11 @@ let AuthController = class AuthController {
         this.authService = authService;
     }
     async login(loginDto) {
-        const token = await this.authService.validateUser(loginDto);
-        if (!token) {
+        const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+        if (!user) {
             throw new common_1.UnauthorizedException('Credenciais inválidas');
         }
-        return token;
+        return this.authService.login(user);
     }
 };
 exports.AuthController = AuthController;

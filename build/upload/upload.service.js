@@ -17,24 +17,44 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const upload_entity_1 = require("./upload.entity");
+const mail_service_1 = require("../mail/mail.service");
 let UploadService = class UploadService {
     uploadRepo;
-    constructor(uploadRepo) {
+    mailService;
+    constructor(uploadRepo, mailService) {
         this.uploadRepo = uploadRepo;
+        this.mailService = mailService;
     }
     async create(data) {
         const novoUpload = this.uploadRepo.create(data);
-        return this.uploadRepo.save(novoUpload);
+        const saved = await this.uploadRepo.save(novoUpload);
+        return saved;
     }
     async findAll() {
         return this.uploadRepo.find({
             order: { created_at: 'DESC' },
         });
     }
+    async findByUser(userId) {
+        return this.uploadRepo.find({
+            where: { userId },
+            order: { created_at: 'DESC' },
+        });
+    }
+    async findById(id) {
+        return this.uploadRepo.findOne({ where: { id } });
+    }
+    async validateDownload(fileId, senha) {
+        const file = await this.uploadRepo.findOneBy({ id: fileId });
+        if (!file)
+            return false;
+        return file.senha === senha;
+    }
 };
 exports.UploadService = UploadService;
 exports.UploadService = UploadService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(upload_entity_1.Upload)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        mail_service_1.MailService])
 ], UploadService);

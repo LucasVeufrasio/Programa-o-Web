@@ -6,26 +6,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserService = void 0;
+exports.MailModule = void 0;
 const common_1 = require("@nestjs/common");
-let UserService = class UserService {
-    create(createUserDto) {
-        return { message: 'Usuário criado com sucesso', data: createUserDto };
-    }
-    findAll() {
-        return [{ id: '1', name: 'Exemplo de Usuário' }];
-    }
-    findOne(id) {
-        return { id, name: 'Exemplo de Usuário' };
-    }
-    update(id, updateUserDto) {
-        return { message: 'Usuário atualizado com sucesso', id, data: updateUserDto };
-    }
-    remove(id) {
-        return { message: 'Usuário removido com sucesso', id };
-    }
+const mail_service_1 = require("./mail.service");
+let MailModule = class MailModule {
 };
-exports.UserService = UserService;
-exports.UserService = UserService = __decorate([
-    (0, common_1.Injectable)()
-], UserService);
+exports.MailModule = MailModule;
+exports.MailModule = MailModule = __decorate([
+    (0, common_1.Module)({
+        providers: [mail_service_1.MailService],
+        exports: [mail_service_1.MailService],
+    })
+], MailModule);

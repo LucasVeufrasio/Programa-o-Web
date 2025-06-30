@@ -17,6 +17,7 @@ let Upload = class Upload {
     email;
     senha;
     created_at;
+    userId;
 };
 exports.Upload = Upload;
 __decorate([
@@ -39,6 +40,10 @@ __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Upload.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Number)
+], Upload.prototype, "userId", void 0);
 exports.Upload = Upload = __decorate([
     (0, typeorm_1.Entity)()
 ], Upload);

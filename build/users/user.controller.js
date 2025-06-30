@@ -17,16 +17,36 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("../dto/create-user.dto");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const upload_service_1 = require("../upload/upload.service"); // importar!
 let UserController = class UserController {
     userService;
-    constructor(userService) {
+    uploadService;
+    constructor(userService, uploadService // injetar!
+    ) {
         this.userService = userService;
+        this.uploadService = uploadService;
     }
     create(createUserDto) {
         return this.userService.create(createUserDto);
     }
+    async getUploadHistory(req) {
+        try {
+            const user = req.user;
+            const userId = user?.sub; // geralmente sub no payload JWT
+            return await this.uploadService.findByUser(userId);
+        }
+        catch (error) {
+            console.error('Erro ao buscar histórico:', error);
+            throw new common_1.HttpException('Erro ao carregar histórico do usuário', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     findAll() {
         return this.userService.findAll();
+    }
+    async getProfile(req) {
+        const user = req.user;
+        const userId = user.sub; // do JWT
+        return this.userService.findOne(userId);
     }
     findOne(id) {
         return this.userService.findOne(Number(id));
@@ -48,11 +68,27 @@ __decorate([
 ], UserController.prototype, "create", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('history'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUploadHistory", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('profile'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
@@ -77,5 +113,7 @@ __decorate([
 ], UserController.prototype, "remove", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
-    __metadata("design:paramtypes", [user_service_1.UserService])
+    __metadata("design:paramtypes", [user_service_1.UserService,
+        upload_service_1.UploadService // injetar!
+    ])
 ], UserController);

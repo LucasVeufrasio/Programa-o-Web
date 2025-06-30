@@ -52,33 +52,63 @@ const multer_1 = require("multer");
 const path_1 = require("path");
 const fs = __importStar(require("fs"));
 const upload_service_1 = require("./upload.service");
+const passport_1 = require("@nestjs/passport");
+const mail_service_1 = require("../mail/mail.service");
+const zip_service_1 = require("../utils/zip.service");
+const path = __importStar(require("path"));
 let UploadController = class UploadController {
     uploadService;
-    constructor(uploadService) {
+    mailService;
+    constructor(uploadService, mailService) {
         this.uploadService = uploadService;
+        this.mailService = mailService;
     }
-    async uploadFile(file, email, senha) {
+    async uploadFile(file, email, senha, req) {
         try {
+            const user = req.user;
+            console.log('req.user:', user);
+            const userId = user.id;
+            if (!userId) {
+                throw new common_1.HttpException('Usuário não identificado no token', common_1.HttpStatus.UNAUTHORIZED);
+            }
             if (!file) {
                 throw new common_1.HttpException('Arquivo não enviado', common_1.HttpStatus.BAD_REQUEST);
             }
             if (!email || !senha) {
-                throw new common_1.HttpException('Email e senha são obrigatórios', common_1.HttpStatus.BAD_REQUEST);
+                throw new common_1.HttpException('Todos os campos são obrigatórios', common_1.HttpStatus.BAD_REQUEST);
             }
+            // salva no banco
             const saved = await this.uploadService.create({
                 filename: file.filename,
                 email,
                 senha,
+                userId,
             });
+            // gera zip protegido
+            const arquivoOriginalPath = (0, path_1.join)(process.cwd(), 'uploads', file.filename);
+            const zipPath = await zip_service_1.ZipService.ziparArquivoComSenha(arquivoOriginalPath, senha);
+            try {
+                await fs.promises.unlink(arquivoOriginalPath);
+                console.log('Arquivo original removido com sucesso');
+            }
+            catch (err) {
+                console.error('Erro ao remover o arquivo original:', err);
+            }
+            await this.mailService.sendMail(email, 'Arquivo criptografado', 'Segue o arquivo zipado. Para abrir, use a senha informada no app.', [
+                {
+                    filename: path.basename(zipPath),
+                    path: zipPath,
+                },
+            ]);
             return {
-                message: 'Arquivo enviado com sucesso!',
+                message: 'Arquivo criptografado e enviado com sucesso!',
                 filename: saved.filename,
                 emailDestino: saved.email,
                 id: saved.id,
             };
         }
         catch (error) {
-            console.error('Erro no upload:', error); // <-- essencial para debug
+            console.error('Erro no upload controller:', error);
             throw new common_1.HttpException({
                 message: 'Erro ao processar upload',
                 error: error.message || error,
@@ -86,11 +116,12 @@ let UploadController = class UploadController {
         }
     }
     listFiles() {
-        const directoryPath = (0, path_1.join)(__dirname, '..', '..', 'uploads');
+        const directoryPath = (0, path_1.join)(process.cwd(), 'uploads');
         try {
-            const files = fs.readdirSync(directoryPath, { withFileTypes: true })
-                .filter(file => file.isFile())
-                .map(file => file.name);
+            const files = fs
+                .readdirSync(directoryPath, { withFileTypes: true })
+                .filter((file) => file.isFile())
+                .map((file) => file.name);
             return files;
         }
         catch (err) {
@@ -98,21 +129,15 @@ let UploadController = class UploadController {
             throw new common_1.HttpException('Erro ao listar arquivos', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async getUploadHistory() {
-        return this.uploadService.findAll();
-    }
-    viewPage(res) {
-        res.sendFile((0, path_1.join)(process.cwd(), 'src', 'upload', 'upload.html'));
-    }
 };
 exports.UploadController = UploadController;
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Post)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', {
         storage: (0, multer_1.diskStorage)({
             destination: (req, file, callback) => {
                 const dir = './uploads';
-                // Garante que o diretório existe
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir, { recursive: true });
                 }
@@ -128,30 +153,20 @@ __decorate([
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Body)('email')),
     __param(2, (0, common_1.Body)('senha')),
+    __param(3, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:paramtypes", [Object, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], UploadController.prototype, "uploadFile", null);
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Get)('list'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UploadController.prototype, "listFiles", null);
-__decorate([
-    (0, common_1.Get)('history'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], UploadController.prototype, "getUploadHistory", null);
-__decorate([
-    (0, common_1.Get)('view'),
-    __param(0, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], UploadController.prototype, "viewPage", null);
 exports.UploadController = UploadController = __decorate([
     (0, common_1.Controller)('upload'),
-    __metadata("design:paramtypes", [upload_service_1.UploadService])
+    __metadata("design:paramtypes", [upload_service_1.UploadService,
+        mail_service_1.MailService])
 ], UploadController);

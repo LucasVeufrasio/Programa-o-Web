@@ -18,33 +18,39 @@
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = e.target.email.value;
-            const password = e.target.password.value;
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        const password = e.target.password.value;
 
-            try {
-                const response = await fetch('http://localhost:3000/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+        try {
+            const response = await fetch('http://localhost:3000/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    // Se quiser armazenar o email para exibir na home
-                    localStorage.setItem('email', email);
+            if (response.ok) {
+                // salva token no localStorage
+                localStorage.setItem('token', data.access_token);
+                
+                // salva também o email para mostrar na home se quiser
+                localStorage.setItem('email', email);
 
-                    // Redireciona para a tela home
-                    window.location.href = 'home.html';
-                } else {
-                    alert('Erro: ' + (data.message || 'Falha ao fazer login'));
-                }
-            } catch (err) {
-                alert('Erro de conexão com o servidor.');
+                console.log(localStorage.getItem("token"))
+
+
+                // redireciona
+                window.location.href = 'home.html';
+            } else {
+                alert('Erro: ' + (data.message || 'Falha ao fazer login'));
             }
-        });
-    </script>
+        } catch (err) {
+            alert('Erro de conexão com o servidor.');
+        }
+    });
+</script>
 </body>
 </html>

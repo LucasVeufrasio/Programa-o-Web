@@ -16,4 +16,7 @@ export class Upload {
 
   @CreateDateColumn()
   created_at!: Date;
+
+  @Column()
+  userId!: number; 
 }

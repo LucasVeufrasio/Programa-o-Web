@@ -5,9 +5,12 @@ import { User } from './users/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { Upload } from './upload/upload.entity';
+import { MailModule } from './mail/mail.module';
+
 
 @Module({
   imports: [
+    MailModule,
     UploadModule,
     AuthModule,
     TypeOrmModule.forRoot({

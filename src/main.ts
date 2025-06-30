@@ -4,17 +4,17 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   app.enableCors({
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-});
+    origin: '*', // ajuste se quiser restringir no futuro
+    methods: '*',
+    credentials: true,
+    allowedHeaders: '*',
+  });
 
-
-  // Serve arquivos estáticos da pasta /uploads
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/files/',
   });
